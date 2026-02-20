@@ -74,8 +74,12 @@ watch(search, () => {
   searchTimeout = setTimeout(loadAssets, 300)
 })
 
-function navigateToAsset(id: string) {
-  router.push(`/assets/${encodeURIComponent(id)}`)
+function navigateToAsset(asset: Asset) {
+  if (asset.type === 'NetworkPrinter') {
+    router.push(`/printers/${encodeURIComponent(asset.id)}`)
+  } else {
+    router.push(`/assets/${encodeURIComponent(asset.id)}`)
+  }
 }
 </script>
 
@@ -179,7 +183,7 @@ function navigateToAsset(id: string) {
               <tr
                 v-for="asset in assets"
                 :key="asset.id"
-                @click="navigateToAsset(asset.id)"
+                @click="navigateToAsset(asset)"
                 class="hover:bg-gray-50 cursor-pointer transition-colors"
               >
                 <td v-if="isOtherPage" class="px-5 py-3">

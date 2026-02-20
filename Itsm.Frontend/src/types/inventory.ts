@@ -151,6 +151,34 @@ export interface Asset {
   updatedAtUtc: string
 }
 
+export interface PrinterDetail {
+  id: string
+  name: string
+  status: AssetStatus
+  serialNumber: string | null
+  assignedUser: string | null
+  location: string | null
+  purchaseDate: string | null
+  warrantyExpiry: string | null
+  cost: number | null
+  notes: string | null
+  source: 'Agent' | 'Manual'
+  discoveredByAgent: string | null
+  createdAtUtc: string
+  updatedAtUtc: string
+  ipAddress: string
+  macAddress: string | null
+  firmwareVersion: string | null
+  pageCount: number | null
+  tonerBlackPercent: number | null
+  tonerCyanPercent: number | null
+  tonerMagentaPercent: number | null
+  tonerYellowPercent: number | null
+  printerStatus: string | null
+  manufacturer: string | null
+  model: string | null
+}
+
 export interface LogEntry {
   timestampUtc: string
   level: string

@@ -1,4 +1,4 @@
-import type { ComputerRecord, DiskUsageRecord, AgentRecord, UpdateType, LogEntry, Asset } from '../types/inventory'
+import type { ComputerRecord, DiskUsageRecord, AgentRecord, UpdateType, LogEntry, Asset, PrinterDetail } from '../types/inventory'
 
 export async function fetchComputers(): Promise<ComputerRecord[]> {
   const res = await fetch('/inventory/computers')
@@ -98,4 +98,10 @@ export async function updateAsset(id: string, asset: Partial<Asset>): Promise<As
 export async function deleteAsset(id: string): Promise<void> {
   const res = await fetch(`/assets/${encodeURIComponent(id)}`, { method: 'DELETE' })
   if (!res.ok) throw new Error(`Failed to delete asset: ${res.status}`)
+}
+
+export async function fetchPrinterDetail(id: string): Promise<PrinterDetail> {
+  const res = await fetch(`/assets/${encodeURIComponent(id)}/printer`)
+  if (!res.ok) throw new Error(`Failed to fetch printer: ${res.status}`)
+  return res.json()
 }

@@ -34,6 +34,45 @@ public static class AssetEndpoints
             return asset is null ? Results.NotFound() : Results.Ok(asset);
         });
 
+        app.MapGet("/assets/{id:guid}/printer", async (Guid id, ItsmDbContext db) =>
+        {
+            var printer = await db.NetworkPrinters
+                .Include(p => p.Asset)
+                .Include(p => p.PrinterModel)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (printer is null) return Results.NotFound();
+
+            return Results.Ok(new
+            {
+                printer.Asset.Id,
+                printer.Asset.Name,
+                printer.Asset.Status,
+                printer.Asset.SerialNumber,
+                printer.Asset.AssignedUser,
+                printer.Asset.Location,
+                printer.Asset.PurchaseDate,
+                printer.Asset.WarrantyExpiry,
+                printer.Asset.Cost,
+                printer.Asset.Notes,
+                printer.Asset.Source,
+                printer.Asset.DiscoveredByAgent,
+                printer.Asset.CreatedAtUtc,
+                printer.Asset.UpdatedAtUtc,
+                printer.IpAddress,
+                printer.MacAddress,
+                printer.FirmwareVersion,
+                printer.PageCount,
+                printer.TonerBlackPercent,
+                printer.TonerCyanPercent,
+                printer.TonerMagentaPercent,
+                printer.TonerYellowPercent,
+                PrinterStatus = printer.Status,
+                Manufacturer = printer.PrinterModel?.Manufacturer,
+                Model = printer.PrinterModel?.Model,
+            });
+        });
+
         app.MapPost("/assets", async (AssetRecord asset, ItsmDbContext db) =>
         {
             var now = DateTime.UtcNow;
