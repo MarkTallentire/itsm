@@ -13,4 +13,9 @@
       <ProjectReference Include="..\Itsm.Api\Itsm.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
+      <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.1" />
+    </ItemGroup>
+
 </Project>

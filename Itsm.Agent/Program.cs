@@ -19,11 +19,13 @@ public class Program
         else
             builder.Services.AddSingleton<IHardwareGatherer, LinuxHardwareGatherer>();
 
+        builder.Services.AddSingleton<IDiskUsageScanner, DiskUsageScanner>();
         builder.Services.AddHttpClient("itsm-api", client =>
         {
             client.BaseAddress = new Uri("https+http://itsm-api");
         });
         builder.Services.AddHostedService<Worker>();
+        builder.Services.AddHostedService<DiskUsageWorker>();
 
         var host = builder.Build();
         host.Run();
