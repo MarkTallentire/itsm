@@ -1,0 +1,6 @@
+services:
+  itsm.agent:
+    image: itsm.agent
+    build:
+      context: .
+      dockerfile: Itsm.Agent/Dockerfile

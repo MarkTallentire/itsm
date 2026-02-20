@@ -1,0 +1,13 @@
+using Itsm.Common.Models;
+
+namespace Itsm.Agent;
+
+public interface IHardwareGatherer
+{
+    CpuInfo GetCpuInformation();
+    MemoryInfo GetMemoryInformation();
+    List<DiskInfo> GetDiskInformation();
+    OsInfo GetOsInformation();
+    NetworkInfo GetNetworkInformation();
+    MachineIdentity GetMachineIdentity();
+}
