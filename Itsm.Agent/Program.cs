@@ -20,12 +20,15 @@ public class Program
             builder.Services.AddSingleton<IHardwareGatherer, LinuxHardwareGatherer>();
 
         builder.Services.AddSingleton<IDiskUsageScanner, DiskUsageScanner>();
+        builder.Services.AddSingleton<HubLoggerProvider>();
+        builder.Logging.Services.AddSingleton<ILoggerProvider>(sp => sp.GetRequiredService<HubLoggerProvider>());
         builder.Services.AddHttpClient("itsm-api", client =>
         {
             client.BaseAddress = new Uri("https+http://itsm-api");
         });
         builder.Services.AddHostedService<Worker>();
         builder.Services.AddHostedService<DiskUsageWorker>();
+        builder.Services.AddHostedService<AgentHubService>();
 
         var host = builder.Build();
         host.Run();

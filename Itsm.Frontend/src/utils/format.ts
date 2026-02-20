@@ -6,15 +6,26 @@ export function formatBytes(bytes: number): string {
   return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`
 }
 
-export function chassisLabel(type: number): string {
-  const labels: Record<number, string> = {
-    0: 'Unknown',
-    1: 'Laptop',
-    2: 'Desktop',
-    3: 'Tower',
-    4: 'Mini',
-    5: 'All-in-One',
-    6: 'Tablet',
+export function chassisLabel(type: string): string {
+  const labels: Record<string, string> = {
+    Laptop: 'Laptop',
+    Desktop: 'Desktop',
+    Tower: 'Tower',
+    Mini: 'Mini',
+    AllInOne: 'All-in-One',
+    Tablet: 'Tablet',
   }
   return labels[type] ?? 'Unknown'
+}
+
+export function chassisIcon(type: string): string {
+  const icons: Record<string, string> = {
+    Laptop: '\uD83D\uDCBB',
+    Desktop: '\uD83D\uDDA5',
+    Tower: '\uD83D\uDDA5',
+    Mini: '\u25AA',
+    AllInOne: '\uD83D\uDDA5',
+    Tablet: '\uD83D\uDCF1',
+  }
+  return icons[type] ?? '\u2753'
 }

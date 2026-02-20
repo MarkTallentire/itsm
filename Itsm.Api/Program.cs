@@ -1,5 +1,7 @@
 using Itsm.Api;
 using Itsm.Api.Endpoints;
+using Itsm.Api.Hubs;
+using Itsm.Api.Services;
 using Npgsql;
 
 namespace Itsm.Api;
@@ -19,11 +21,16 @@ public class Program
 
         builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
+        builder.Services.AddSignalR();
+        builder.Services.AddSingleton<AgentLogService>();
+
+        builder.Services.ConfigureHttpJsonOptions(options =>
+            options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("dev", policy =>
-                policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                policy.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
         });
 
         var app = builder.Build();
@@ -39,8 +46,11 @@ public class Program
 
         app.MigrateDatabase();
 
+        app.MapHub<AgentHub>("/hubs/agent");
+
         app.MapComputerEndpoints();
         app.MapDiskUsageEndpoints();
+        app.MapAgentEndpoints();
 
         app.Run();
     }

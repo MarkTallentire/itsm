@@ -4,7 +4,7 @@ export interface MachineIdentity {
   serialNumber: string
   hardwareUuid: string
   loggedInUser: string
-  chassisType: number
+  chassisType: string
 }
 
 export interface CpuInfo {
@@ -71,4 +71,23 @@ export interface DiskUsageRecord {
   computerName: string
   scannedAtUtc: string
   data: DiskUsageSnapshot
+}
+
+export interface AgentRecord {
+  hardwareUuid: string
+  computerName: string
+  displayName: string
+  agentVersion: string
+  isConnected: boolean
+  lastSeenUtc: string
+  firstSeenUtc: string
+}
+
+export type UpdateType = 'Inventory' | 'DiskUsage'
+
+export interface LogEntry {
+  timestampUtc: string
+  level: string
+  category: string
+  message: string
 }

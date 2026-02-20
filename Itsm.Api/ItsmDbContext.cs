@@ -17,10 +17,22 @@ public class DiskUsageRecord
     public DiskUsageSnapshot Data { get; set; } = null!;
 }
 
+public class AgentRecord
+{
+    public string HardwareUuid { get; set; } = "";
+    public string ComputerName { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public string AgentVersion { get; set; } = "";
+    public bool IsConnected { get; set; }
+    public DateTime LastSeenUtc { get; set; }
+    public DateTime FirstSeenUtc { get; set; }
+}
+
 public class ItsmDbContext(DbContextOptions<ItsmDbContext> options) : DbContext(options)
 {
     public DbSet<ComputerRecord> Computers => Set<ComputerRecord>();
     public DbSet<DiskUsageRecord> DiskUsageSnapshots => Set<DiskUsageRecord>();
+    public DbSet<AgentRecord> Agents => Set<AgentRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +46,11 @@ public class ItsmDbContext(DbContextOptions<ItsmDbContext> options) : DbContext(
         {
             e.HasKey(d => d.ComputerName);
             e.Property(d => d.Data).HasColumnType("jsonb");
+        });
+
+        modelBuilder.Entity<AgentRecord>(e =>
+        {
+            e.HasKey(a => a.HardwareUuid);
         });
     }
 }
@@ -51,13 +68,22 @@ public static class MigrationExtensions
             try
             {
                 db.Database.Migrate();
-                return;
+                break;
             }
             catch (Exception ex) when (attempt < 9)
             {
                 logger.LogWarning(ex, "Database migration attempt {Attempt} failed, retrying...", attempt + 1);
                 Thread.Sleep(2000);
             }
+        }
+
+        try
+        {
+            db.Database.ExecuteSqlRaw("UPDATE \"Agents\" SET \"IsConnected\" = false");
+        }
+        catch (Npgsql.PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            // Table does not exist on first run — safe to ignore
         }
     }
 }
