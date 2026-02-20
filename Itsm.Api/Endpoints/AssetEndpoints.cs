@@ -25,13 +25,48 @@ public static class AssetEndpoints
                     (a.AssignedUser != null && a.AssignedUser.ToLower().Contains(term)));
             }
 
-            return await query.OrderBy(a => a.Name).ToListAsync();
+            var assets = await query.OrderBy(a => a.Name).ToListAsync();
+
+            var agentUuids = assets
+                .Where(a => a.DiscoveredByAgent != null)
+                .Select(a => a.DiscoveredByAgent!)
+                .Distinct()
+                .ToList();
+
+            var uuidToName = await db.Computers
+                .Where(c => agentUuids.Contains(c.HardwareUuid))
+                .ToDictionaryAsync(c => c.HardwareUuid, c => c.ComputerName);
+
+            return assets.Select(a => new
+            {
+                a.Id, a.Name, a.Type, a.Status, a.SerialNumber, a.AssignedUser,
+                a.Location, a.PurchaseDate, a.WarrantyExpiry, a.Cost, a.Notes,
+                a.Source, a.DiscoveredByAgent,
+                DiscoveredByComputerName = a.DiscoveredByAgent != null && uuidToName.TryGetValue(a.DiscoveredByAgent, out var cn) ? cn : null,
+                a.CreatedAtUtc, a.UpdatedAtUtc,
+            }).ToList();
         });
 
         app.MapGet("/assets/{id:guid}", async (Guid id, ItsmDbContext db) =>
         {
             var asset = await db.Assets.FindAsync(id);
-            return asset is null ? Results.NotFound() : Results.Ok(asset);
+            if (asset is null) return Results.NotFound();
+
+            string? discoveredByName = null;
+            if (asset.DiscoveredByAgent != null)
+                discoveredByName = await db.Computers
+                    .Where(c => c.HardwareUuid == asset.DiscoveredByAgent)
+                    .Select(c => c.ComputerName)
+                    .FirstOrDefaultAsync();
+
+            return Results.Ok(new
+            {
+                asset.Id, asset.Name, asset.Type, asset.Status, asset.SerialNumber, asset.AssignedUser,
+                asset.Location, asset.PurchaseDate, asset.WarrantyExpiry, asset.Cost, asset.Notes,
+                asset.Source, asset.DiscoveredByAgent,
+                DiscoveredByComputerName = discoveredByName,
+                asset.CreatedAtUtc, asset.UpdatedAtUtc,
+            });
         });
 
         app.MapGet("/assets/{id:guid}/printer", async (Guid id, ItsmDbContext db) =>
@@ -42,6 +77,13 @@ public static class AssetEndpoints
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (printer is null) return Results.NotFound();
+
+            string? discoveredByName = null;
+            if (printer.Asset.DiscoveredByAgent != null)
+                discoveredByName = await db.Computers
+                    .Where(c => c.HardwareUuid == printer.Asset.DiscoveredByAgent)
+                    .Select(c => c.ComputerName)
+                    .FirstOrDefaultAsync();
 
             return Results.Ok(new
             {
@@ -57,6 +99,7 @@ public static class AssetEndpoints
                 printer.Asset.Notes,
                 printer.Asset.Source,
                 printer.Asset.DiscoveredByAgent,
+                DiscoveredByComputerName = discoveredByName,
                 printer.Asset.CreatedAtUtc,
                 printer.Asset.UpdatedAtUtc,
                 printer.IpAddress,

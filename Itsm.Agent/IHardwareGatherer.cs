@@ -16,4 +16,11 @@ public interface IHardwareGatherer
     UptimeInfo GetUptimeInformation();
     FirewallInfo GetFirewallInformation();
     EncryptionInfo GetEncryptionInformation();
+    BiosInfo GetBiosInformation();
+    MotherboardInfo GetMotherboardInformation();
+    List<AntivirusInfo> GetAntivirusInformation();
+    List<SystemController> GetControllers();
+    VirtualizationInfo GetVirtualizationInformation();
+    List<DatabaseInstanceInfo> GetDatabaseInstances();
+    Task<LocationInfo?> GetLocationAsync();
 }

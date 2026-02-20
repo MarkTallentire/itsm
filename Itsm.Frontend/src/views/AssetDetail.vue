@@ -176,7 +176,16 @@ function formatDate(utc: string): string {
             <dd class="text-gray-700">{{ asset.source }}</dd>
             <template v-if="asset.discoveredByAgent">
               <dt class="text-gray-400 font-medium">Discovered By</dt>
-              <dd class="text-gray-700 font-mono text-xs">{{ asset.discoveredByAgent }}</dd>
+              <dd class="text-gray-700">
+                <RouterLink
+                  v-if="asset.discoveredByComputerName"
+                  :to="`/computers/${encodeURIComponent(asset.discoveredByComputerName)}`"
+                  class="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
+                >
+                  {{ asset.discoveredByComputerName }}
+                </RouterLink>
+                <span class="font-mono text-xs text-gray-400 ml-1.5">({{ asset.discoveredByAgent }})</span>
+              </dd>
             </template>
             <dt class="text-gray-400 font-medium">Created</dt>
             <dd class="text-gray-700">{{ formatDate(asset.createdAtUtc) }}</dd>
