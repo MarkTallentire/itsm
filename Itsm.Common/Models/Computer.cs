@@ -6,4 +6,10 @@ public record Computer(
     MemoryInfo Memory,
     List<DiskInfo> Disks,
     OsInfo Os,
-    NetworkInfo Network);
+    NetworkInfo Network,
+    List<GpuInfo> Gpus,
+    BatteryInfo Battery,
+    List<InstalledApp> InstalledApps,
+    UptimeInfo Uptime,
+    FirewallInfo Firewall,
+    EncryptionInfo Encryption);

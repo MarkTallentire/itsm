@@ -6,9 +6,9 @@ import DiskUsageView from './views/DiskUsageView.vue'
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', component: ComputerList },
-    { path: '/computers/:name', component: ComputerDetail, props: true },
-    { path: '/disk-usage/:name', component: DiskUsageView, props: true },
+    { path: '/', component: ComputerList, meta: { title: 'Computers' } },
+    { path: '/computers/:name', component: ComputerDetail, props: true, meta: { title: 'Computers' } },
+    { path: '/disk-usage/:name', component: DiskUsageView, props: true, meta: { title: 'Disk Usage' } },
   ],
 })
 

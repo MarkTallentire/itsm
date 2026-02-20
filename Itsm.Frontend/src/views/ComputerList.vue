@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import type { ComputerRecord, AgentRecord } from '../types/inventory'
 import { fetchComputers, fetchAgents } from '../services/api'
-import { formatBytes, chassisLabel, chassisIcon } from '../utils/format'
+import { chassisLabel, chassisIcon, timeAgo, computeComplianceStatus, computeDiskHealth } from '../utils/format'
+import FleetSummaryStrip from '../components/FleetSummaryStrip.vue'
+import ComplianceBadge from '../components/ComplianceBadge.vue'
+import DiskMiniBar from '../components/DiskMiniBar.vue'
 
+const router = useRouter()
 const computers = ref<ComputerRecord[]>([])
 const agents = ref<Map<string, AgentRecord>>(new Map())
 const loading = ref(true)
@@ -23,33 +28,36 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function navigateToComputer(name: string) {
+  router.push(`/computers/${encodeURIComponent(name)}`)
+}
+
+function getAgent(c: ComputerRecord): AgentRecord | undefined {
+  return agents.value.get(c.data.identity.hardwareUuid)
+}
 </script>
 
 <template>
   <div>
-    <div class="mb-8">
+    <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Computers</h1>
       <p class="text-sm text-gray-500 mt-1">Manage and monitor all enrolled devices</p>
     </div>
 
     <!-- Loading skeleton -->
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div v-for="n in 6" :key="n" class="bg-white rounded-xl border border-gray-200/80 p-5 space-y-3">
-        <div class="flex items-start justify-between">
-          <div class="space-y-2">
-            <div class="skeleton h-5 w-36"></div>
-            <div class="skeleton h-4 w-24"></div>
-          </div>
-          <div class="skeleton h-6 w-16 rounded-full"></div>
+    <div v-if="loading" class="space-y-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div v-for="n in 4" :key="n" class="bg-white rounded-lg border border-gray-200 p-4 space-y-2">
+          <div class="skeleton h-3 w-20"></div>
+          <div class="skeleton h-7 w-12"></div>
         </div>
-        <div class="space-y-2 pt-1">
-          <div class="skeleton h-3.5 w-full"></div>
-          <div class="skeleton h-3.5 w-48"></div>
-          <div class="skeleton h-3.5 w-40"></div>
-        </div>
-        <div class="flex gap-3 pt-2">
-          <div class="skeleton h-4 w-14"></div>
-          <div class="skeleton h-4 w-20"></div>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div v-for="n in 6" :key="n" class="flex items-center gap-4 px-5 py-3.5 border-b border-gray-100">
+          <div class="skeleton h-4 w-4 rounded-full"></div>
+          <div class="skeleton h-4 w-40"></div>
+          <div class="skeleton h-4 w-24 ml-auto"></div>
         </div>
       </div>
     </div>
@@ -76,50 +84,78 @@ onMounted(async () => {
       <p class="text-sm text-gray-500 mt-1">Devices will appear here once agents start reporting in.</p>
     </div>
 
-    <!-- Computer cards -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <RouterLink
-        v-for="(rec, i) in computers"
-        :key="rec.computerName"
-        :to="`/computers/${encodeURIComponent(rec.computerName)}`"
-        class="group bg-white rounded-xl border border-gray-200/80 p-5 shadow-sm hover:shadow-md hover:border-gray-300 transition-all duration-200 animate-fade-in block"
-        :style="{ animationDelay: `${i * 50}ms` }"
-      >
-        <div class="flex items-start justify-between mb-3">
-          <div>
-            <h2 class="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full" :class="agents.get(rec.data.identity.hardwareUuid)?.isConnected ? 'bg-green-500' : 'bg-gray-300'"></span>
-              {{ rec.data.identity.computerName }}
-            </h2>
-            <p class="text-sm text-gray-500">{{ rec.data.identity.modelName }}</p>
-          </div>
-          <span class="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
-            <span>{{ chassisIcon(rec.data.identity.chassisType) }}</span>
-            {{ chassisLabel(rec.data.identity.chassisType) }}
-          </span>
-        </div>
+    <!-- Fleet summary + data table -->
+    <template v-else>
+      <FleetSummaryStrip :computers="computers" :agents="agents" />
 
-        <div class="space-y-1.5 text-sm text-gray-600 mb-4">
-          <p class="truncate">{{ rec.data.cpu.brandString }}</p>
-          <p>{{ rec.data.cpu.coreCount }} cores · {{ formatBytes(rec.data.memory.totalBytes) }} RAM</p>
-          <p class="text-gray-500">{{ rec.data.os.description }}</p>
-          <p class="text-xs text-gray-400">User: {{ rec.data.identity.loggedInUser }}</p>
-          <p v-if="agents.get(rec.data.identity.hardwareUuid)?.displayName" class="text-xs text-gray-400">Agent: {{ agents.get(rec.data.identity.hardwareUuid)!.displayName }}</p>
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs text-gray-400 uppercase tracking-wider bg-gray-50 border-b border-gray-200">
+                <th class="px-5 py-3 font-medium w-10">Status</th>
+                <th class="px-5 py-3 font-medium">Device</th>
+                <th class="px-5 py-3 font-medium">User</th>
+                <th class="px-5 py-3 font-medium">OS</th>
+                <th class="px-5 py-3 font-medium">Compliance</th>
+                <th class="px-5 py-3 font-medium">Disk</th>
+                <th class="px-5 py-3 font-medium">Last Seen</th>
+                <th class="px-5 py-3 font-medium">Type</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr
+                v-for="rec in computers"
+                :key="rec.computerName"
+                @click="navigateToComputer(rec.computerName)"
+                class="hover:bg-gray-50 cursor-pointer transition-colors"
+              >
+                <!-- Status -->
+                <td class="px-5 py-3">
+                  <span
+                    class="w-2.5 h-2.5 rounded-full inline-block"
+                    :class="getAgent(rec)?.isConnected ? 'bg-green-500' : 'bg-gray-300'"
+                    :title="getAgent(rec)?.isConnected ? 'Online' : 'Offline'"
+                  ></span>
+                </td>
+                <!-- Device -->
+                <td class="px-5 py-3">
+                  <div class="font-medium text-gray-900">{{ rec.data.identity.computerName }}</div>
+                  <div class="text-xs text-gray-500">{{ rec.data.identity.modelName }}</div>
+                </td>
+                <!-- User -->
+                <td class="px-5 py-3 text-gray-600">{{ rec.data.identity.loggedInUser }}</td>
+                <!-- OS -->
+                <td class="px-5 py-3 text-gray-600 text-xs">{{ rec.data.os.description }}</td>
+                <!-- Compliance -->
+                <td class="px-5 py-3">
+                  <ComplianceBadge :firewall="rec.data.firewall" :encryption="rec.data.encryption" />
+                </td>
+                <!-- Disk -->
+                <td class="px-5 py-3">
+                  <DiskMiniBar
+                    v-if="rec.data.disks.length > 0"
+                    :percent="computeDiskHealth(rec.data.disks).worstPercent"
+                  />
+                  <span v-else class="text-xs text-gray-400">-</span>
+                </td>
+                <!-- Last Seen -->
+                <td class="px-5 py-3 text-xs text-gray-500">
+                  <template v-if="getAgent(rec)">{{ timeAgo(getAgent(rec)!.lastSeenUtc) }}</template>
+                  <template v-else>-</template>
+                </td>
+                <!-- Type -->
+                <td class="px-5 py-3">
+                  <span class="inline-flex items-center gap-1 text-xs text-gray-500">
+                    <span>{{ chassisIcon(rec.data.identity.chassisType) }}</span>
+                    {{ chassisLabel(rec.data.identity.chassisType) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <div class="flex gap-3 pt-3 border-t border-gray-100">
-          <span class="text-xs font-medium text-primary-600 group-hover:text-primary-700 transition-colors">
-            View Details
-          </span>
-          <RouterLink
-            :to="`/disk-usage/${encodeURIComponent(rec.computerName)}`"
-            class="text-xs font-medium text-gray-400 hover:text-primary-600 transition-colors"
-            @click.stop
-          >
-            Disk Usage
-          </RouterLink>
-        </div>
-      </RouterLink>
-    </div>
+      </div>
+    </template>
   </div>
 </template>

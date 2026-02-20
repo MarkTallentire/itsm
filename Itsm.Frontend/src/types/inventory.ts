@@ -26,6 +26,45 @@ export interface DiskInfo {
 
 export interface OsInfo {
   description: string
+  version: string | null
+  buildNumber: string | null
+}
+
+export interface GpuInfo {
+  name: string
+  vendor: string
+  vramBytes: number | null
+  driverVersion: string | null
+}
+
+export interface BatteryInfo {
+  isPresent: boolean
+  chargePercent: number | null
+  cycleCount: number | null
+  healthPercent: number | null
+  isCharging: boolean | null
+  condition: string | null
+}
+
+export interface InstalledApp {
+  name: string
+  version: string
+  installDate: string | null
+}
+
+export interface UptimeInfo {
+  lastBootUtc: string
+  uptime: string
+}
+
+export interface FirewallInfo {
+  isEnabled: boolean
+  stealthMode: boolean | null
+}
+
+export interface EncryptionInfo {
+  isEnabled: boolean
+  method: string | null
 }
 
 export interface NetworkInterfaceInfo {
@@ -46,6 +85,12 @@ export interface Computer {
   disks: DiskInfo[]
   os: OsInfo
   network: NetworkInfo
+  gpus: GpuInfo[]
+  battery: BatteryInfo
+  installedApps: InstalledApp[]
+  uptime: UptimeInfo
+  firewall: FirewallInfo
+  encryption: EncryptionInfo
 }
 
 export interface ComputerRecord {

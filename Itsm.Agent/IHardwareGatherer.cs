@@ -10,4 +10,10 @@ public interface IHardwareGatherer
     OsInfo GetOsInformation();
     NetworkInfo GetNetworkInformation();
     MachineIdentity GetMachineIdentity();
+    List<GpuInfo> GetGpuInformation();
+    BatteryInfo GetBatteryInformation();
+    List<InstalledApp> GetInstalledApplications();
+    UptimeInfo GetUptimeInformation();
+    FirewallInfo GetFirewallInformation();
+    EncryptionInfo GetEncryptionInformation();
 }

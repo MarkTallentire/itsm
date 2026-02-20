@@ -46,7 +46,13 @@ public class AgentHubService(
                         Memory: hardwareGatherer.GetMemoryInformation(),
                         Disks: hardwareGatherer.GetDiskInformation(),
                         Os: hardwareGatherer.GetOsInformation(),
-                        Network: hardwareGatherer.GetNetworkInformation());
+                        Network: hardwareGatherer.GetNetworkInformation(),
+                        Gpus: hardwareGatherer.GetGpuInformation(),
+                        Battery: hardwareGatherer.GetBatteryInformation(),
+                        InstalledApps: hardwareGatherer.GetInstalledApplications(),
+                        Uptime: hardwareGatherer.GetUptimeInformation(),
+                        Firewall: hardwareGatherer.GetFirewallInformation(),
+                        Encryption: hardwareGatherer.GetEncryptionInformation());
                     await client.PostAsJsonAsync("/inventory/computer", computer);
                     logger.LogInformation("Inventory update posted successfully");
                 }
