@@ -97,3 +97,51 @@ export function parseUptime(timeSpanStr: string): string {
   if (days > 0) return `${days}d ${hours}h`
   return `${hours}h`
 }
+
+import type { AssetType, AssetStatus } from '../types/inventory'
+
+export function assetTypeLabel(type: AssetType): string {
+  const labels: Record<AssetType, string> = {
+    Computer: 'Computer',
+    Monitor: 'Monitor',
+    UsbPeripheral: 'USB Device',
+    NetworkPrinter: 'Printer',
+    Phone: 'Phone',
+    Tablet: 'Tablet',
+    Other: 'Other',
+  }
+  return labels[type] ?? type
+}
+
+export function assetTypeIcon(type: AssetType): string {
+  const icons: Record<AssetType, string> = {
+    Computer: '\uD83D\uDCBB',
+    Monitor: '\uD83D\uDDA5',
+    UsbPeripheral: '\uD83D\uDD0C',
+    NetworkPrinter: '\uD83D\uDDA8',
+    Phone: '\uD83D\uDCF1',
+    Tablet: '\uD83D\uDCF1',
+    Other: '\uD83D\uDCE6',
+  }
+  return icons[type] ?? '\u2753'
+}
+
+export function assetStatusLabel(status: AssetStatus): string {
+  const labels: Record<AssetStatus, string> = {
+    InUse: 'In Use',
+    InStorage: 'In Storage',
+    Decommissioned: 'Decommissioned',
+    Lost: 'Lost',
+  }
+  return labels[status] ?? status
+}
+
+export function assetStatusColor(status: AssetStatus): { bg: string; text: string; dot: string } {
+  const colors: Record<AssetStatus, { bg: string; text: string; dot: string }> = {
+    InUse: { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500' },
+    InStorage: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
+    Decommissioned: { bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400' },
+    Lost: { bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-500' },
+  }
+  return colors[status] ?? { bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400' }
+}

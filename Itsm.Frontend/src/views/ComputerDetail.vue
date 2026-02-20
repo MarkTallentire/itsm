@@ -118,6 +118,21 @@ onMounted(async () => {
     } catch {
       // Agent may not exist yet
     }
+    // Auto-open logs and start streaming when agent is connected
+    if (agent.value?.isConnected) {
+      logsOpen.value = true
+      try {
+        logs.value = await fetchLogs(agent.value.hardwareUuid)
+        scrollToBottom()
+      } catch {
+        // May not have any logs yet
+      }
+      eventSource = streamLogs(agent.value.hardwareUuid, (entry) => {
+        logs.value.push(entry)
+        if (logs.value.length > 1000) logs.value.splice(0, logs.value.length - 1000)
+        scrollToBottom()
+      })
+    }
   }
 })
 

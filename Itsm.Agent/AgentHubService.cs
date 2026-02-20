@@ -10,6 +10,8 @@ public class AgentHubService(
     IConfiguration configuration,
     IHardwareGatherer hardwareGatherer,
     IDiskUsageScanner diskUsageScanner,
+    IPeripheralGatherer peripheralGatherer,
+    INetworkPrinterScanner printerScanner,
     IHttpClientFactory httpClientFactory,
     HubLoggerProvider hubLoggerProvider) : BackgroundService
 {
@@ -61,6 +63,18 @@ public class AgentHubService(
                     var snapshot = diskUsageScanner.Scan(DefaultMinimumSizeBytes);
                     await client.PostAsJsonAsync("/inventory/disk-usage", snapshot);
                     logger.LogInformation("Disk usage update posted successfully");
+                }
+                else if (updateType == UpdateType.Peripherals)
+                {
+                    var identity = hardwareGatherer.GetMachineIdentity();
+                    var report = new PeripheralReport(
+                        identity.HardwareUuid,
+                        identity.ComputerName,
+                        peripheralGatherer.GetMonitors(),
+                        peripheralGatherer.GetUsbDevices(),
+                        await printerScanner.ScanAsync());
+                    await client.PostAsJsonAsync("/inventory/peripherals", report);
+                    logger.LogInformation("Peripheral update posted successfully");
                 }
             }
             catch (Exception ex)

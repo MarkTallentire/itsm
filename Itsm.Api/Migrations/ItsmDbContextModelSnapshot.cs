@@ -54,21 +54,249 @@ namespace Itsm.Api.Migrations
                     b.ToTable("Agents");
                 });
 
-            modelBuilder.Entity("Itsm.Api.ComputerRecord", b =>
+            modelBuilder.Entity("Itsm.Api.AssetRecord", b =>
                 {
-                    b.Property<string>("ComputerName")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AssignedUser")
                         .HasColumnType("text");
 
-                    b.Property<Computer>("Data")
+                    b.Property<decimal?>("Cost")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscoveredByAgent")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("jsonb");
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SerialNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("WarrantyExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Assets");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("BatteryCharge")
+                        .HasColumnType("double precision");
+
+                    b.Property<bool?>("BatteryCharging")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("BatteryCondition")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("BatteryCycles")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("BatteryHealth")
+                        .HasColumnType("double precision");
+
+                    b.Property<bool>("BatteryPresent")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ChassisType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ComputerName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CpuArchitecture")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CpuBrand")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("CpuCores")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("EncryptionEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("EncryptionMethod")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("FirewallEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("FirewallStealth")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("HardwareUuid")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Hostname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastBootUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastUpdatedUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ComputerName");
+                    b.Property<string>("LoggedInUser")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OsBuildNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OsDescription")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OsVersion")
+                        .HasColumnType("text");
+
+                    b.Property<long>("TotalMemoryBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Uptime")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputerName")
+                        .IsUnique();
+
+                    b.HasIndex("HardwareUuid")
+                        .IsUnique();
 
                     b.ToTable("Computers");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerGpuEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ComputerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DriverVersion")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("GpuModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long?>("VramBytes")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputerId");
+
+                    b.HasIndex("GpuModelId");
+
+                    b.ToTable("ComputerGpus");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerSoftwareEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ComputerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("InstallDate")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SoftwareTitleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputerId");
+
+                    b.HasIndex("SoftwareTitleId");
+
+                    b.ToTable("ComputerSoftware");
+                });
+
+            modelBuilder.Entity("Itsm.Api.DiskEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ComputerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("FreeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("TotalBytes")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputerId");
+
+                    b.ToTable("Disks");
                 });
 
             modelBuilder.Entity("Itsm.Api.DiskUsageRecord", b =>
@@ -86,6 +314,367 @@ namespace Itsm.Api.Migrations
                     b.HasKey("ComputerName");
 
                     b.ToTable("DiskUsageSnapshots");
+                });
+
+            modelBuilder.Entity("Itsm.Api.GpuModelEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Vendor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name", "Vendor")
+                        .IsUnique();
+
+                    b.ToTable("GpuModels");
+                });
+
+            modelBuilder.Entity("Itsm.Api.MonitorEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("ManufactureYear")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("MonitorModelId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonitorModelId");
+
+                    b.ToTable("Monitors");
+                });
+
+            modelBuilder.Entity("Itsm.Api.MonitorModelEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("DiagonalInches")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("HeightPixels")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Manufacturer")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("WidthPixels")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Manufacturer", "ModelName")
+                        .IsUnique();
+
+                    b.ToTable("MonitorModels");
+                });
+
+            modelBuilder.Entity("Itsm.Api.NetworkInterfaceEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ComputerId")
+                        .HasColumnType("uuid");
+
+                    b.PrimitiveCollection<string[]>("IpAddresses")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("MacAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputerId");
+
+                    b.ToTable("NetworkInterfaces");
+                });
+
+            modelBuilder.Entity("Itsm.Api.NetworkPrinterEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirmwareVersion")
+                        .HasColumnType("text");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MacAddress")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PageCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("PrinterModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("TonerBlackPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TonerCyanPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TonerMagentaPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TonerYellowPercent")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrinterModelId");
+
+                    b.ToTable("NetworkPrinters");
+                });
+
+            modelBuilder.Entity("Itsm.Api.PrinterModelEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Manufacturer")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Manufacturer", "Model")
+                        .IsUnique();
+
+                    b.ToTable("PrinterModels");
+                });
+
+            modelBuilder.Entity("Itsm.Api.SoftwareTitleEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("SoftwareTitles");
+                });
+
+            modelBuilder.Entity("Itsm.Api.UsbPeripheralEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UsbProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsbProductId");
+
+                    b.ToTable("UsbPeripherals");
+                });
+
+            modelBuilder.Entity("Itsm.Api.UsbProductEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Manufacturer")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VendorId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("UsbProducts");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.AssetRecord", "Asset")
+                        .WithOne()
+                        .HasForeignKey("Itsm.Api.ComputerEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerGpuEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.ComputerEntity", "Computer")
+                        .WithMany("ComputerGpus")
+                        .HasForeignKey("ComputerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Itsm.Api.GpuModelEntity", "GpuModel")
+                        .WithMany()
+                        .HasForeignKey("GpuModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Computer");
+
+                    b.Navigation("GpuModel");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerSoftwareEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.ComputerEntity", "Computer")
+                        .WithMany("ComputerSoftware")
+                        .HasForeignKey("ComputerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Itsm.Api.SoftwareTitleEntity", "SoftwareTitle")
+                        .WithMany()
+                        .HasForeignKey("SoftwareTitleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Computer");
+
+                    b.Navigation("SoftwareTitle");
+                });
+
+            modelBuilder.Entity("Itsm.Api.DiskEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.ComputerEntity", "Computer")
+                        .WithMany("Disks")
+                        .HasForeignKey("ComputerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Computer");
+                });
+
+            modelBuilder.Entity("Itsm.Api.MonitorEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.AssetRecord", "Asset")
+                        .WithOne()
+                        .HasForeignKey("Itsm.Api.MonitorEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Itsm.Api.MonitorModelEntity", "MonitorModel")
+                        .WithMany()
+                        .HasForeignKey("MonitorModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("MonitorModel");
+                });
+
+            modelBuilder.Entity("Itsm.Api.NetworkInterfaceEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.ComputerEntity", "Computer")
+                        .WithMany("NetworkInterfaces")
+                        .HasForeignKey("ComputerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Computer");
+                });
+
+            modelBuilder.Entity("Itsm.Api.NetworkPrinterEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.AssetRecord", "Asset")
+                        .WithOne()
+                        .HasForeignKey("Itsm.Api.NetworkPrinterEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Itsm.Api.PrinterModelEntity", "PrinterModel")
+                        .WithMany()
+                        .HasForeignKey("PrinterModelId");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("PrinterModel");
+                });
+
+            modelBuilder.Entity("Itsm.Api.UsbPeripheralEntity", b =>
+                {
+                    b.HasOne("Itsm.Api.AssetRecord", "Asset")
+                        .WithOne()
+                        .HasForeignKey("Itsm.Api.UsbPeripheralEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Itsm.Api.UsbProductEntity", "UsbProduct")
+                        .WithMany()
+                        .HasForeignKey("UsbProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("UsbProduct");
+                });
+
+            modelBuilder.Entity("Itsm.Api.ComputerEntity", b =>
+                {
+                    b.Navigation("ComputerGpus");
+
+                    b.Navigation("ComputerSoftware");
+
+                    b.Navigation("Disks");
+
+                    b.Navigation("NetworkInterfaces");
                 });
 #pragma warning restore 612, 618
         }

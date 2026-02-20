@@ -17,7 +17,7 @@ public class DiskUsageWorker(
             try
             {
                 logger.LogInformation("Starting disk usage scan");
-                var snapshot = scanner.Scan(DefaultMinimumSizeBytes);
+                var snapshot = await Task.Run(() => scanner.Scan(DefaultMinimumSizeBytes), stoppingToken);
 
                 var client = httpClientFactory.CreateClient("itsm-api");
                 var response = await client.PostAsJsonAsync("/inventory/disk-usage", snapshot, stoppingToken);

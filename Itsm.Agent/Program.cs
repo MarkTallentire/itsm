@@ -19,6 +19,14 @@ public class Program
         else
             builder.Services.AddSingleton<IHardwareGatherer, LinuxHardwareGatherer>();
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            builder.Services.AddSingleton<IPeripheralGatherer, MacPeripheralGatherer>();
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            builder.Services.AddSingleton<IPeripheralGatherer, WindowsPeripheralGatherer>();
+        else
+            builder.Services.AddSingleton<IPeripheralGatherer, LinuxPeripheralGatherer>();
+
+        builder.Services.AddSingleton<INetworkPrinterScanner, NetworkPrinterScanner>();
         builder.Services.AddSingleton<IDiskUsageScanner, DiskUsageScanner>();
         builder.Services.AddSingleton<HubLoggerProvider>();
         builder.Logging.Services.AddSingleton<ILoggerProvider>(sp => sp.GetRequiredService<HubLoggerProvider>());
@@ -28,6 +36,7 @@ public class Program
         });
         builder.Services.AddHostedService<Worker>();
         builder.Services.AddHostedService<DiskUsageWorker>();
+        builder.Services.AddHostedService<PeripheralWorker>();
         builder.Services.AddHostedService<AgentHubService>();
 
         var host = builder.Build();

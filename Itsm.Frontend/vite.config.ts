@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
@@ -14,6 +15,12 @@ export default defineConfig({
       '/inventory': { target: apiTarget, changeOrigin: true, secure: false },
       '/agents': { target: apiTarget, changeOrigin: true, secure: false },
       '/hubs': { target: apiTarget, changeOrigin: true, secure: false, ws: true },
+      '/assets': { target: apiTarget, changeOrigin: true, secure: false },
     },
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 })

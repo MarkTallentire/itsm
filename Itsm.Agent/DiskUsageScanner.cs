@@ -44,7 +44,10 @@ public class DiskUsageScanner(ILogger<DiskUsageScanner> logger) : IDiskUsageScan
         _currentPath = directory.FullName;
 
         if (_directoriesScanned % 1000 == 0)
+        {
             logger.LogInformation("Progress: {Count:N0} directories scanned — currently at {Path}", _directoriesScanned, _currentPath);
+            Thread.Sleep(10); // yield CPU so other workers can make progress
+        }
 
         long totalSize = 0;
         var children = new List<DirectoryNode>();
@@ -104,7 +107,17 @@ public class DiskUsageScanner(ILogger<DiskUsageScanner> logger) : IDiskUsageScan
             return new HashSet<string>(StringComparer.Ordinal) { "/proc", "/sys", "/dev" };
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            return new HashSet<string>(StringComparer.Ordinal) { "/dev" };
+            return new HashSet<string>(StringComparer.Ordinal)
+            {
+                "/dev",
+                "/System",
+                "/Volumes",
+                "/private/var/vm",
+                "/private/var/folders",
+                "/private/var/db/dyld",
+                "/Library/Caches",
+                "/System/Volumes",
+            };
 
         return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }

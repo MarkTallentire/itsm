@@ -128,7 +128,28 @@ export interface AgentRecord {
   firstSeenUtc: string
 }
 
-export type UpdateType = 'Inventory' | 'DiskUsage'
+export type UpdateType = 'Inventory' | 'DiskUsage' | 'Peripherals'
+
+export type AssetType = 'Computer' | 'Monitor' | 'UsbPeripheral' | 'NetworkPrinter' | 'Phone' | 'Tablet' | 'Other'
+export type AssetStatus = 'InUse' | 'InStorage' | 'Decommissioned' | 'Lost'
+
+export interface Asset {
+  id: string
+  name: string
+  type: AssetType
+  status: AssetStatus
+  serialNumber: string | null
+  assignedUser: string | null
+  location: string | null
+  purchaseDate: string | null
+  warrantyExpiry: string | null
+  cost: number | null
+  notes: string | null
+  source: 'Agent' | 'Manual'
+  discoveredByAgent: string | null
+  createdAtUtc: string
+  updatedAtUtc: string
+}
 
 export interface LogEntry {
   timestampUtc: string

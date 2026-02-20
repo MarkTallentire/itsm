@@ -51,6 +51,8 @@ public class Program
         app.MapComputerEndpoints();
         app.MapDiskUsageEndpoints();
         app.MapAgentEndpoints();
+        app.MapAssetEndpoints();
+        app.MapPeripheralEndpoints();
 
         app.Run();
     }
