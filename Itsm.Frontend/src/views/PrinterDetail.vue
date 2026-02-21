@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import type { PrinterDetail, AssetStatus } from '../types/inventory'
 import { fetchPrinterDetail, updateAsset, deleteAsset } from '../services/api'
 import { timeAgo } from '../utils/format'
@@ -263,7 +263,16 @@ async function confirmDelete() {
             <dd class="text-gray-700">{{ printer.source }}</dd>
             <template v-if="printer.discoveredByAgent">
               <dt class="text-gray-400 font-medium">Discovered By</dt>
-              <dd class="text-gray-700 font-mono text-xs">{{ printer.discoveredByAgent }}</dd>
+              <dd class="text-gray-700">
+                <RouterLink
+                  v-if="printer.discoveredByComputerName"
+                  :to="`/computers/${encodeURIComponent(printer.discoveredByComputerName)}`"
+                  class="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
+                >
+                  {{ printer.discoveredByComputerName }}
+                </RouterLink>
+                <span class="font-mono text-xs text-gray-400 ml-1.5">({{ printer.discoveredByAgent }})</span>
+              </dd>
             </template>
             <dt class="text-gray-400 font-medium">First Seen</dt>
             <dd class="text-gray-700">{{ formatDate(printer.createdAtUtc) }}</dd>

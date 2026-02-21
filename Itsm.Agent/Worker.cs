@@ -26,7 +26,14 @@ public class Worker(
                     InstalledApps: hardwareGatherer.GetInstalledApplications(),
                     Uptime: hardwareGatherer.GetUptimeInformation(),
                     Firewall: hardwareGatherer.GetFirewallInformation(),
-                    Encryption: hardwareGatherer.GetEncryptionInformation());
+                    Encryption: hardwareGatherer.GetEncryptionInformation(),
+                    Bios: hardwareGatherer.GetBiosInformation(),
+                    Motherboard: hardwareGatherer.GetMotherboardInformation(),
+                    Antivirus: hardwareGatherer.GetAntivirusInformation(),
+                    Controllers: hardwareGatherer.GetControllers(),
+                    Virtualization: hardwareGatherer.GetVirtualizationInformation(),
+                    Databases: hardwareGatherer.GetDatabaseInstances(),
+                    Location: await hardwareGatherer.GetLocationAsync());
 
                 var client = httpClientFactory.CreateClient("itsm-api");
                 var response = await client.PostAsJsonAsync("/inventory/computer", computer, stoppingToken);

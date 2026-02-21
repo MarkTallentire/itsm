@@ -12,4 +12,11 @@ public record Computer(
     List<InstalledApp> InstalledApps,
     UptimeInfo Uptime,
     FirewallInfo Firewall,
-    EncryptionInfo Encryption);
+    EncryptionInfo Encryption,
+    BiosInfo Bios,
+    MotherboardInfo Motherboard,
+    List<AntivirusInfo> Antivirus,
+    List<SystemController> Controllers,
+    VirtualizationInfo Virtualization,
+    List<DatabaseInstanceInfo> Databases,
+    LocationInfo? Location);
